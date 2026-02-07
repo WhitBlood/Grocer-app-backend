@@ -55,19 +55,21 @@ async def register(user_data: UserCreate, db: DbSession):
 @router.post("/login", response_model=Token)
 async def login(credentials: UserLogin, db: DbSession):
     """
-    Login with username and password.
+    Login with email or username and password.
     
     - Verifies credentials
     - Returns JWT token and user info
     """
-    # Find user
-    user = db.query(User).filter(User.username == credentials.username).first()
+    # Find user by email or username
+    user = db.query(User).filter(
+        (User.email == credentials.username) | (User.username == credentials.username)
+    ).first()
     
     # Verify user exists and password is correct
     if not user or not verify_password(credentials.password, user.hashed_password):
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Invalid username or password",
+            detail="Invalid email or password",
             headers={"WWW-Authenticate": "Bearer"},
         )
     
