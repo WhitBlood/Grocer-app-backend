@@ -49,10 +49,48 @@ async def root():
 
 @app.get("/health")
 async def health_check():
-    """Detailed health check"""
-    return {
+    """
+    Detailed health check endpoint.
+    Tests database connectivity and returns service status.
+    """
+    from sqlalchemy import text
+    from .database import SessionLocal
+    
+    health_status = {
         "status": "healthy",
-        "database": "connected"
+        "service": "FreshMart API",
+        "version": "1.0.0",
+        "database": "unknown"
     }
+    
+    # Test database connection
+    try:
+        db = SessionLocal()
+        db.execute(text("SELECT 1"))
+        db.close()
+        health_status["database"] = "connected"
+    except Exception as e:
+        health_status["status"] = "unhealthy"
+        health_status["database"] = f"disconnected: {str(e)}"
+    
+    return health_status
+
+@app.get("/ready")
+async def readiness_check():
+    """
+    Readiness check for Kubernetes/Docker.
+    Returns 200 if service is ready to accept traffic.
+    """
+    from sqlalchemy import text
+    from .database import SessionLocal
+    from fastapi import HTTPException
+    
+    try:
+        db = SessionLocal()
+        db.execute(text("SELECT 1"))
+        db.close()
+        return {"status": "ready"}
+    except Exception as e:
+        raise HTTPException(status_code=503, detail=f"Service not ready: {str(e)}")
 
 
