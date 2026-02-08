@@ -30,10 +30,16 @@ async def get_current_user(token: TokenStr, db: DbSession) -> User:
         print(f"❌ Token decode failed: {token[:50]}...")
         raise credentials_exception
     
-    # Get user ID from token
-    user_id: int = payload.get("sub")
-    if user_id is None:
+    # Get user ID from token (convert from string to int)
+    user_id_str = payload.get("sub")
+    if user_id_str is None:
         print(f"❌ No 'sub' in token payload: {payload}")
+        raise credentials_exception
+    
+    try:
+        user_id = int(user_id_str)
+    except (ValueError, TypeError):
+        print(f"❌ Invalid 'sub' format: {user_id_str}")
         raise credentials_exception
     
     print(f"✅ Token decoded successfully. User ID: {user_id}")

@@ -81,8 +81,9 @@ async def login(credentials: UserLogin, db: DbSession):
         )
     
     # Create access token
+    # Note: 'sub' must be a string for JWT standard compliance
     access_token = create_access_token(
-        data={"sub": user.id, "username": user.username, "role": user.role}
+        data={"sub": str(user.id), "username": user.username, "role": user.role}
     )
     
     return {
