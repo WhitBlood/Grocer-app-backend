@@ -27,18 +27,24 @@ async def get_current_user(token: TokenStr, db: DbSession) -> User:
     # Decode token
     payload = decode_access_token(token)
     if payload is None:
+        print(f"❌ Token decode failed: {token[:50]}...")
         raise credentials_exception
     
     # Get user ID from token
     user_id: int = payload.get("sub")
     if user_id is None:
+        print(f"❌ No 'sub' in token payload: {payload}")
         raise credentials_exception
+    
+    print(f"✅ Token decoded successfully. User ID: {user_id}")
     
     # Get user from database
     user = db.query(User).filter(User.id == user_id).first()
     if user is None:
+        print(f"❌ User not found in database: ID {user_id}")
         raise credentials_exception
     
+    print(f"✅ User found: {user.email}")
     return user
 
 # Type alias for current user dependency
