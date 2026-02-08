@@ -23,13 +23,14 @@ app = FastAPI(
 ALLOWED_ORIGINS = os.getenv("ALLOWED_ORIGINS", "http://localhost:3000,http://localhost:5173,http://127.0.0.1:5500")
 origins_list = [origin.strip() for origin in ALLOWED_ORIGINS.split(",")]
 
-# Configure CORS
+# Configure CORS - Allow all origins for AWS deployment
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=origins_list,
+    allow_origins=["*"],  # Allow all origins for AWS deployment
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
+    expose_headers=["*"]
 )
 
 # Include routers
