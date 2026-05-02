@@ -1,210 +1,180 @@
-# 🚀 FreshMart Backend API
+Grocery Store - A roducion-radyst with support for both local development and AWS RDS Aurora PostgreSQL deployment�Featues
 
-Complete FastAPI backend for FreshMart grocery e-commerce application.
+- **User Management**: Registratin, authntiaion,JWT okens
+- **Pod Catalog**: Categois, produts with ratigs an reviews-**ShoingCart&Orders**:Full order maagemen sstem
+-**AddressManagement**:Multipledeliveryaddressesperuser
+-**AWSReady**:SeamlessdeploymenttoAWSRDSAuror
+- **DorSupport**: Coanerd fo easy deployment- **Health Checks**:Built-inhealthandredness edoints
+- **CORS Configured**: Read forfrontendintegration
 
-## 📁 Project Structure
+##📋Prerequisites
 
-```
-BackEnd/
-├── app/
-│   ├── __init__.py              # Package initializer
-│   ├── main.py                  # FastAPI application
-│   ├── database.py              # Database connection
-│   ├── models.py                # SQLAlchemy models
-│   ├── schemas.py               # Pydantic schemas
-│   ├── config.py                # Configuration settings
-│   ├── dependencies.py          # Reusable dependencies
-│   │
-│   ├── routers/                 # API endpoints
-│   │   ├── __init__.py
-│   │   ├── auth.py              # Authentication
-│   │   ├── addresses.py         # Address management
-│   │   ├── products.py          # Product catalog
-│   │   └── orders.py            # Order management
-│   │
-│   └── utils/                   # Helper functions
-│       ├── __init__.py
-│       └── security.py          # Password & JWT utilities
-│
-├── .env                         # Environment variables (create this!)
-├── .env.example                 # Example environment file
-├── requirements.txt             # Python dependencies
-├── init_db.py                   # Database initialization
-├── test_db.py                   # Test database connection
-├── BACKEND_GUIDE.md             # Complete guide Part 1
-├── BACKEND_GUIDE_PART2.md       # Complete guide Part 2
-├── BACKEND_GUIDE_PART3.md       # Complete guide Part 3
-└── LOCAL_POSTGRES_SETUP.md      # PostgreSQL setup guide
-```
+-Python3.12+
+-PostgreSQL15+(local)orAWSRDSAuroraPostgreSQL
+-Docker(optional,forcontainerizeddatabe)
+- WS CL (for AWSdeoyment)
 
-## 🚀 Quick Start
+## 🏃 Quk Start
 
-### 1. Create Database
+### 1. Clone nd Seup
 
 ```bash
-createdb freshmart_db
+gt clone <your-repo>
+cd Grocer-app-backend
+pythn -m venv vevsourcevenv/bin/activate#Winows: venv\Scripts\civt
+piinstall-rrequirements.txt
 ```
 
-### 2. Create `.env` File
-
-Copy `.env.example` to `.env` and update with your credentials:
+###2.ConfigureEnvironment
 
 ```bash
-cp .env.example .env
+cp.env.example.env
+#Edit.envwithyourconfiguration
 ```
 
-Edit `.env`:
-```env
-DATABASE_URL=postgresql://postgres:your_password@localhost:5432/freshmart_db
-SECRET_KEY=your-super-secret-key-change-this
-ALGORITHM=HS256
-ACCESS_TOKEN_EXPIRE_MINUTES=10080
-ALLOWED_ORIGINS=http://localhost:3000,http://localhost:5173
+###3. Start
+
+**Option A:Doker**
+```bash
+dcker ru --ame frshmar-pstgres \-ePOSTGRES_USER=to_usr \
+ -ePOSTGRES_PASSWORD=ams123\
+-ePOSTGRES_DB=freshmart_db\
+-p5432:5432\
+-dpostgres:15
 ```
 
-### 3. Install Dependencies
+**OptionB:LocalPostgre**
+```bash
+sudo servipstgrsq tartsudo-upotgr sql -c"CREATEUSERtodo_userWITHPASSWORD'ams123';"
+sudo-upostgrespsql-c"CREATEDATABASEfreshmart_dbOWNERtodo_user;"
+```
+
+##4. IializeDatabae
+
+```bas
+python rcrete_table.py```
+
+###5.RunAppliati
 
 ```bash
-pip install -r requirements.txt
+uvcorn appmain:ap --reload
 ```
 
-### 4. Test Database Connection
+Visit:
+-API:http://localhost:8000
+-Docs:http://localhost:8000/docs
+-Health:http://localhost:8000/health
+
+##🌐AWSDeployment
+
+ForAWSRDSAuroraPostgreSQLdeployment,see[docs/AWS_DEPLOYMENT.md](docs/AWS_DEPLOYMENT.md)
+
+## Quick AWS Setup
+
+1. **Setenvirnmet varables**
+   ```bash
+   export USE_AWS_SECRETS=tre
+   expot AWS_REGION=us-es-1
+   exprtAWS_SECRET_NAME=rd-db-password
+   ```
+
+2. **Crae AWS Secre**
+   ```bahawsscrtsmaagr rate-ecret\
+--namerds-db-password\
+  --scret-string '{
+       "ernm":"frshmart_admi",
+       "passwor": "your-password",
+       "host": "your-clustr.lustr-xxxxx.u-east-1.rds.amazonaws.com","pr": 5432,
+       "dbnam": "fehmart_db",
+"SECRET_KEY":"your-jwt-secret"
+}'
+```
+
+3.**Deploy application** (EC2, ECS, or Lambda)
+
+# 📁rojectStructure
+
+```
+Grocer-app-back/
+├── ap/
+│   ├── ruer/      #APIroutehadlerson endpits├Utiity#JWT&phashng   configpy#Configurationmanagement
+│├──database.pyDtasonncon│   modlsySQLAchmymds│   schapy    #Pydanticschemas
+│├──dependencies.pyFastAI│   └maAppc entry pointocs/Documn│   WS_DPLOYMET.md
+│   ├── ATABASESCHMA
+│└──...
+├──.env.example  Envirnent tema
+├──.ignorerequireents.txtPythn dendncsockerfile     nainrfiniionADM       Thifl�ConfguaionEnvionmnVrils| Vile| Dcipion|Dful||----------|-------------|---------||USE_AWS_SECRETS|UsAWSSMagr|fals || ` | PSQL cnntin ing | Rquie || `` | JWT   | Rqured || `VONM` | nvironment name | `development` || `S` | COR alwed rigin | `000` || LOG_LEVEL|Loggig vl | `INFO` || SQL_ECHO|LogSQL ei|`ru|See[ev.exmp](.vxmp)forcoefguiooin.�Proucts
+- `GET /poduct/` - Lit all productprouct{id}t producdetis
+- `GET/prodct/category/{catgory_id}` - Poductsby ctegory
+
+### Ores
+- `GET /ordr/` - Lit uerododrore
+- `GET /ordr/{id}`- Get od dtail
+
+###AddressesLisures
+-`POST /addss/`- Add new ddress
+
+###HlGE` - Bc hhcheck
+`GET/hh`-Dtaldhelstatready` - Readiness be
+
+Full API ocmentation: http://loalhos:8000/doc
+
+##🗄️DatabasSchem
+
+Theaplicatin seeollowng tab: **users**-Use accn
+- **user_adresses**Dliveryaddress
+- **ategores**- P categories**** - Produt calo
+- **ders** - Custororders
+**ordr_iems**- Oder line items
+
+See [dcs/DATABASE_SCHEMA.m](do/DATABASE_SCHEMA.md)fordeaild schema.
+
+## 🐳 DckeBuil Imag``bash
+ockbuild tfshmr-api.
+```
+
+### RuCntaine
+```bash
+ockn -d \
+  --name fhmr-api \  p8000:8000\
+  --nv-file .env \
+  fehmart-api
+``
+
+##🧪Tsing
 
 ```bash
-python test_db.py
+#Rn test
+pytst
+
+# Withcveage
+pytt --cov=apptsts/
 ```
 
-### 5. Initialize Database
+## 📊 Montoing
 
-```bash
-python init_db.py
-```
+### Hlh Cecks
+ **Liveness**:halthRurns 200 app sunning
+-**Radns**:GEeay` - Rtun 200 f atabase is onetd
 
-This creates all tables and adds sample data.
+### Logging
 
-### 6. Start Server
+Appicationlogsiu:
+-Rest/espons log
+-Databse qery logs (when `SQL_ECHO=rue`-Errortrac
+- Healh checksul## 🔒 ScuJWT-bad uthntictohshg with bcrypt- ORS prtctionSQL injction pevetion (SQLAlchmyORM)
+- Envirment-base scretsAWS Secret Manageintegrtin�-[AWSDeoymnG](ocs/WSDELYMN)
+[Schma](docs/DATASSCHMA)
+[HalhChek Gid](doc/HELTHHCK)
+[Stu Checkls](doc/ST_CHECKLISx)🤝tributig1.Fok herository
+2. Craea fatu banh
+3. Make yuchnges
+4 Subt  ullquest#📝Lene
+MIT Lese
 
-```bash
-uvicorn app.main:app --reload
-```
-
-### 7. Test API
-
-Open: http://localhost:8000/docs
-
-## 📚 API Endpoints
-
-### Authentication
-- `POST /auth/register` - Register new user
-- `POST /auth/login` - Login and get JWT token
-- `GET /auth/me` - Get current user info (requires auth)
-
-### Addresses
-- `GET /addresses/` - Get all user addresses (requires auth)
-- `POST /addresses/` - Create new address (requires auth)
-- `GET /addresses/{id}` - Get specific address (requires auth)
-- `PUT /addresses/{id}` - Update address (requires auth)
-- `DELETE /addresses/{id}` - Delete address (requires auth)
-- `POST /addresses/{id}/set-default` - Set default address (requires auth)
-
-### Products
-- `GET /products/` - Get all products (with filters)
-- `GET /products/{id}` - Get specific product
-- `GET /products/category/{name}` - Get products by category
-
-### Orders
-- `POST /orders/` - Create new order (requires auth)
-- `GET /orders/` - Get user orders (requires auth)
-- `GET /orders/{id}` - Get specific order (requires auth)
-- `POST /orders/{id}/cancel` - Cancel order (requires auth)
-
-## 🧪 Test Credentials
-
-After running `init_db.py`:
-
-**Admin:**
-- Username: `admin`
-- Password: `admin123`
-
-**Customer:**
-- Username: `john_doe`
-- Password: `password123`
-
-## 📖 Documentation
-
-Read the complete guides in order:
-
-1. **LOCAL_POSTGRES_SETUP.md** - Database setup
-2. **BACKEND_GUIDE.md** - Project structure & setup
-3. **BACKEND_GUIDE_PART2.md** - API endpoints
-4. **BACKEND_GUIDE_PART3.md** - Testing & deployment
-
-## 🔧 Common Commands
-
-```bash
-# Start development server
-uvicorn app.main:app --reload
-
-# Start with custom host/port
-uvicorn app.main:app --reload --host 0.0.0.0 --port 8000
-
-# Test database connection
-python test_db.py
-
-# Initialize/reset database
-python init_db.py
-
-# Install dependencies
-pip install -r requirements.txt
-
-# Check PostgreSQL status
-pg_isready
-```
-
-## 🐛 Troubleshooting
-
-### "ModuleNotFoundError: No module named 'app'"
-
-Run from BackEnd directory:
-```bash
-cd BackEnd
-uvicorn app.main:app --reload
-```
-
-### "Could not connect to database"
-
-1. Check PostgreSQL is running: `pg_isready`
-2. Verify DATABASE_URL in `.env`
-3. Ensure database exists: `createdb freshmart_db`
-
-### "SECRET_KEY not found"
-
-Create `.env` file with SECRET_KEY (see `.env.example`)
-
-## 📦 Database Models
-
-- **User** - User accounts
-- **UserAddress** - Delivery addresses
-- **Category** - Product categories
-- **Product** - Products catalog
-- **Order** - Customer orders
-- **OrderItem** - Items in orders
-
-## 🔐 Security
-
-- Passwords hashed with bcrypt
-- JWT tokens for authentication
-- Token expiry: 7 days (configurable)
-- CORS configured for frontend origins
-
-## 🚀 Deployment
-
-See **BACKEND_GUIDE_PART3.md** for production deployment guide.
-
-## 📝 License
-
-MIT
-
-## 🤝 Support
-
-For detailed guides, see the BACKEND_GUIDE files in this directory.
+##🆘Tublesing##DCIssu```bash
+T cecio
+ockr x -t frhmart-ogres psqU todo_use-d fshar_dbif daabasi rnningdocker s | rep potgs#AWSSecsaageIsss```bash
+#Testseretievalwseetsgergetsect-vae--ser-idrds--psword# IAMpemsos
+awsmgt-ole-polc--rol-ameYoRol--poly-nmYouPolicy
+``Applicatio Wn'Start1. hckexssandha corrctus2.Verifydiunningccibl3.hck los frr4.Ensuealldepenenieinsle:`pipinall-quit.txt`�ppoForiuenqss:Chck[oc/]dos/) fdrevwerl-Chckatabasencvty---Bilwih ❤️sngFaPadPosgSQL

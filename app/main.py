@@ -1,32 +1,40 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from dotenv import load_dotenv
-import os
+import logging
 
+from .config import settings
 from .database import engine, Base
 from .routers import auth, addresses, products, orders
 
-# Load environment variables
-load_dotenv()
+# Configure logging
+logging.basicConfig(
+    level=settings.LOG_LEVEL,
+    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
+)
+logger = logging.getLogger(__name__)
 
 # Create database tables
+logger.info("Creating database tables if they don't exist...")
 Base.metadata.create_all(bind=engine)
+logger.info("✅ Database tables ready")
 
-# Create FastAPI app
+# Create FastAPI app with dynamic configuration
 app = FastAPI(
-    title="FreshMart API",
-    description="Backend API for FreshMart Grocery Store",
-    version="1.0.0"
+    title=settings.API_TITLE,
+    description=settings.API_DESCRIPTION,
+    version=settings.API_VERSION,
+    docs_url="/docs" if not settings.is_production else None,  # Disable docs in production
+    redoc_url="/redoc" if not settings.is_production else None,
 )
 
-# Get allowed origins from environment
-ALLOWED_ORIGINS = os.getenv("ALLOWED_ORIGINS", "http://localhost:3000,http://localhost:5173,http://127.0.0.1:5500")
-origins_list = [origin.strip() for origin in ALLOWED_ORIGINS.split(",")]
+logger.info(f"Starting {settings.API_TITLE} v{settings.API_VERSION}")
+logger.info(f"Environment: {settings.ENVIRONMENT}")
+logger.info(f"CORS Origins: {settings.origins_list}")
 
-# Configure CORS - Allow all origins for AWS deployment
+# Configure CORS
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],  # Allow all origins for AWS deployment
+    allow_origins=settings.origins_list,  # Use configured origins
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -39,14 +47,31 @@ app.include_router(addresses.router)
 app.include_router(products.router)
 app.include_router(orders.router)
 
+logger.info("✅ All routers registered")
+
+
+@app.on_event("startup")
+async def startup_event():
+    """Run on application startup."""
+    logger.info("🚀 Application startup complete")
+
+
+@app.on_event("shutdown")
+async def shutdown_event():
+    """Run on application shutdown."""
+    logger.info("👋 Application shutting down")
+
+
 @app.get("/")
 async def root():
     """Health check endpoint"""
     return {
-        "message": "FreshMart API is running!",
-        "version": "1.0.0",
-        "status": "healthy"
+        "message": f"{settings.API_TITLE} is running!",
+        "version": settings.API_VERSION,
+        "status": "healthy",
+        "environment": settings.ENVIRONMENT
     }
+
 
 @app.get("/health")
 async def health_check():
@@ -59,8 +84,9 @@ async def health_check():
     
     health_status = {
         "status": "healthy",
-        "service": "FreshMart API",
-        "version": "1.0.0",
+        "service": settings.API_TITLE,
+        "version": settings.API_VERSION,
+        "environment": settings.ENVIRONMENT,
         "database": "unknown"
     }
     
@@ -70,16 +96,19 @@ async def health_check():
         db.execute(text("SELECT 1"))
         db.close()
         health_status["database"] = "connected"
+        logger.debug("Health check: database connection successful")
     except Exception as e:
         health_status["status"] = "unhealthy"
         health_status["database"] = f"disconnected: {str(e)}"
+        logger.error(f"Health check: database connection failed - {e}")
     
     return health_status
+
 
 @app.get("/ready")
 async def readiness_check():
     """
-    Readiness check for Kubernetes/Docker.
+    Readiness check for Kubernetes/Docker/ECS.
     Returns 200 if service is ready to accept traffic.
     """
     from sqlalchemy import text
@@ -90,8 +119,9 @@ async def readiness_check():
         db = SessionLocal()
         db.execute(text("SELECT 1"))
         db.close()
-        return {"status": "ready"}
+        return {"status": "ready", "environment": settings.ENVIRONMENT}
     except Exception as e:
+        logger.error(f"Readiness check failed: {e}")
         raise HTTPException(status_code=503, detail=f"Service not ready: {str(e)}")
 
 

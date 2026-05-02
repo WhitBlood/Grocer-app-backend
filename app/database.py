@@ -1,20 +1,24 @@
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy.ext.declarative import declarative_base
-from dotenv import load_dotenv
-import os
+from app.config import settings
+import logging
 
-# Load environment variables
-load_dotenv()
+logger = logging.getLogger(__name__)
 
-# Get database URL from environment variable
-SQLALCHEMY_DATABASE_URL = os.getenv("DATABASE_URL", "postgresql://kzts669:ams123@localhost:5432/freshmart_db")
+# Get database URL from settings
+SQLALCHEMY_DATABASE_URL = settings.DATABASE_URL
 
-# Create the engine
+logger.info(f"Initializing database connection")
+
+# Create the engine with dynamic configuration
 engine = create_engine(
     SQLALCHEMY_DATABASE_URL,
     pool_pre_ping=True,  # Verify connections before using
-    echo=True  # Log SQL queries (disable in production)
+    echo=settings.SQL_ECHO,  # Log SQL queries based on environment
+    pool_size=10,  # Connection pool size
+    max_overflow=20,  # Max connections beyond pool_size
+    pool_recycle=3600,  # Recycle connections after 1 hour
 )
 
 # Create a SessionLocal class for managing database sessions
